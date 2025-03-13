@@ -1,10 +1,11 @@
 
-import React, { useState, useEffect } from "react";
-import { postService } from "../services/axiosApi";
+import React, { useEffect, useState } from "react";
+import { postService } from "../services/axiosApi"; 
 import { Link } from "react-router-dom";
 import { Button, Card, CardContent, Typography, Box, CircularProgress, IconButton } from "@mui/material";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
-import "./Css-styles/PostList.css";
+import "./Css-styles/PostList.css"; 
+
 
 const PostList: React.FC = () => {
   const [posts, setPosts] = useState<any[]>([]);
@@ -18,7 +19,9 @@ const PostList: React.FC = () => {
         const postsArray = Object.entries(response.data).map(([id, post]) => ({
           id,
           ...post,
+
           likes: post.likes || 0,
+
         }));
         setPosts(postsArray);
         setLoading(false);
