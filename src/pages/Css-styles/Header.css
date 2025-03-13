@@ -1,0 +1,42 @@
+/* Стили для шапки */
+header {
+    background-color: #ff4500; /* Красный фон */
+    padding: 15px 0;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 20px;
+    padding-right: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  header img {
+    width: 40px;  /* Размер логотипа */
+    height: 40px; /* Размер логотипа */
+    border-radius: 50%; /* Круглый логотип */
+  }
+  
+  header h1 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: bold;
+    color: white;
+  }
+  
+  header nav {
+    display: flex;
+  }
+  
+  header nav a {
+    color: white;
+    text-decoration: none;
+    margin-left: 20px;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+  
+  header nav a:hover {
+    text-decoration: underline;
+  }
+  
