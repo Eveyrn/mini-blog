@@ -1,32 +1,13 @@
-// import React from "react";
-// import { Link } from "react-router-dom";
-// import "./Css-styles/Header.css"; // Импортируем стили для Header
-
-// const Header: React.FC = () => {
-//   return (
-//     <header>
-//       <h1>Mini-Reddit</h1>
-//       <nav>
-//         <Link to="/">Главная</Link>
-//         <Link to="/create">Создать пост</Link>
-//       </nav>
-//     </header>
-//   );
-// };
-
-// export default Header;
-
-
 import React from "react";
 import { Link } from "react-router-dom";
-import { FaReddit } from "react-icons/fa"; // Логотип Reddit из React Icons
-import "./Css-styles/Header.css"; // Импортируем стили для Header
+import { FaReddit } from "react-icons/fa"; 
+import "./Css-styles/Header.css"; 
 
 const Header: React.FC = () => {
   return (
     <header>
-      {/* Логотип Reddit */}
-      <FaReddit size={40} color="white" /> {/* Вы можете настроить размер и цвет */}
+  
+      <FaReddit size={40} color="white" /> 
       <h1>Mini-Reddit</h1>
       <nav>
         <Link to="/">Главная</Link>
