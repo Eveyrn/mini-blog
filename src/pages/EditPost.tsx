@@ -1,51 +1,71 @@
-import React, { useState, useEffect } from "react";
+
+
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { postService } from "../services/axiosApi";
-import { TextField, Button } from "@mui/material";
+import { TextField, Button, Box } from "@mui/material";
 
 const EditPost: React.FC = () => {
   const { id } = useParams();
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const [post, setPost] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (id) {
       postService.getPostById(id).then((response) => {
-        const post = response.data;
-        setTitle(post.title);
-        setContent(post.content);
+        setPost(response.data);
+      }).catch(() => {
+        setError("Не удалось загрузить пост.");
       });
     }
   }, [id]);
 
-  const handleSubmit = () => {
+  const handleUpdatePost = () => {
     if (id) {
-      postService.updatePost(id, { title, content }).then(() => {
+      postService.updatePost(id, post).then(() => {
         navigate(`/posts/${id}`);
+      }).catch(() => {
+        setError("Не удалось обновить пост.");
       });
     }
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPost({ ...post, [e.target.name]: e.target.value });
+  };
+
+  if (!post) {
+    return <div>Загрузка...</div>;
+  }
+
   return (
-    <div>
-      <h2>Редактировать пост</h2>
+    <Box sx={{ padding: 3 }}>
       <TextField
         label="Заголовок"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
+        name="title"
+        variant="outlined"
         fullWidth
+        value={post.title}
+        onChange={handleChange}
+        sx={{ marginBottom: 2 }}
       />
       <TextField
-        label="Контент"
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
+        label="Содержимое"
+        name="content"
+        variant="outlined"
         fullWidth
         multiline
         rows={4}
+        value={post.content}
+        onChange={handleChange}
+        sx={{ marginBottom: 2 }}
       />
-      <Button onClick={handleSubmit} variant="outlined">Сохранить</Button>
-    </div>
+      <Button variant="contained" color="primary" onClick={handleUpdatePost}>
+        Обновить пост
+      </Button>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+    </Box>
   );
 };
 
