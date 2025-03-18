@@ -1,36 +1,32 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { postService } from "../services/axiosApi"; // Используем свой API
+import { apiService } from "../services/axiosApi"; 
 import { Button, TextField } from "@mui/material";
-import "./Css-styles/CreatePost.css";  // Импортируем стили
+import "./Css-styles/CreatePost.css";
 
 const CreatePost: React.FC = () => {
   const [title, setTitle] = useState<string>("");
   const [content, setContent] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();  // Для редиректа на страницу со всеми постами
+  const navigate = useNavigate(); 
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!title || !content) {
       setError("Пожалуйста, заполните все поля.");
       return;
     }
 
-    postService
-      .createPost({ title, content })
-      .then(() => {
-        navigate("/"); // Перенаправляем на главную страницу с постами
-      })
-      .catch(() => {
-        setError("Не удалось создать пост. Попробуйте снова.");
-      });
+    try {
+      await apiService.createPost({ title, content });
+      navigate("/");
+    } catch (error) {
+      setError("Не удалось создать пост. Попробуйте снова.");
+    }
   };
 
   return (
     <div className="create-post-container">
       <h2>Создать пост</h2>
-
       <div className="input-fields">
         <TextField
           label="Заголовок"
@@ -66,4 +62,3 @@ const CreatePost: React.FC = () => {
 };
 
 export default CreatePost;
-

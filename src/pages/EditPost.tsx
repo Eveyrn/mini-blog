@@ -1,8 +1,6 @@
-
-
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { postService } from "../services/axiosApi";
+import { apiService } from "../services/axiosApi";
 import { TextField, Button, Box } from "@mui/material";
 
 const EditPost: React.FC = () => {
@@ -13,21 +11,22 @@ const EditPost: React.FC = () => {
 
   useEffect(() => {
     if (id) {
-      postService.getPostById(id).then((response) => {
-        setPost(response.data);
+      apiService.getPostById(id).then((response) => {
+        setPost(response);
       }).catch(() => {
         setError("Не удалось загрузить пост.");
       });
     }
   }, [id]);
 
-  const handleUpdatePost = () => {
-    if (id) {
-      postService.updatePost(id, post).then(() => {
+  const handleUpdatePost = async () => {
+    if (id && post) {
+      try {
+        await apiService.updatePost(id, post);
         navigate(`/posts/${id}`);
-      }).catch(() => {
+      } catch (error) {
         setError("Не удалось обновить пост.");
-      });
+      }
     }
   };
 

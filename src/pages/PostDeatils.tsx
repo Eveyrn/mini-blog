@@ -1,58 +1,71 @@
-
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { postService } from "../services/axiosApi"; 
-import { Typography, IconButton } from "@mui/material";
+import { apiService } from "../services/axiosApi"; 
+import { IPost, IComment } from "../types";
+import { Typography, IconButton, Box, CircularProgress, Button } from "@mui/material";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import DeleteIcon from "@mui/icons-material/Delete"; 
 import "./Css-styles/PostDetails.css";
 
 const PostDetails: React.FC = () => {
-  const { id } = useParams();
-  const [post, setPost] = useState<any | null>(null);
-  const [comment, setComment] = useState({ author: "", text: "" });
-  const [comments, setComments] = useState<any[]>([]);
+  const { id } = useParams(); 
+  const [post, setPost] = useState<IPost | null>(null);  
+  const [comments, setComments] = useState<IComment[]>([]);  
+  const [comment, setComment] = useState<IComment>({ id: "", author: "", text: "" });  
+  const [error, setError] = useState<string | null>(null); 
 
   useEffect(() => {
     if (id) {
-      postService.getPostById(id).then((response) => {
-        setPost(response.data);
-        if (Array.isArray(response.data.comments)) {
-          setComments(response.data.comments);
-        } else {
-          setComments([]);
+      apiService.getPostById(id).then((response) => {
+        if (response) {
+          setPost(response);
+          setComments(Array.isArray(response.comments) ? response.comments : []);
         }
+      }).catch((err) => {
+        setError("Ошибка при загрузке поста.");
+        console.error(err);
       });
     }
   }, [id]);
 
-
   const handleCommentSubmit = () => {
     if (id && comment.author && comment.text) {
-      postService.addComment(id, comment).then(() => {
-        setComments([...comments, comment]);
-        setComment({ author: "", text: "" });
-      });
-    }
-  };
-
-  const handleLike = () => {
-    if (id) {
-      postService.incrementLikes(id).then(() => {
-        setPost({ ...post, likes: post.likes + 1 });
+      apiService.addComment(id, comment).then(() => {
+        setComments([...comments, comment]);  
+        setComment({ id: "", author: "", text: "" }); 
+      }).catch(() => {
+        setError("Не удалось добавить комментарий.");
       });
     }
   };
 
   const handleDeleteComment = (commentId: string) => {
     if (id) {
-      postService.deleteComment(id, commentId).then(() => {
-        setComments(comments.filter((comment) => comment.id !== commentId));
+      apiService.deleteComment(id, commentId).then(() => {
+        setComments(comments.filter((comment) => comment.id !== commentId)); 
+      }).catch(() => {
+        setError("Не удалось удалить комментарий.");
       });
     }
   };
 
-  if (!post) return <div>Загрузка...</div>;
+  const handleLike = () => {
+    if (id && post) {
+      apiService.incrementLikes(id).then(() => {
+        setPost({ ...post, likes: (post.likes || 0) + 1 });
+      }).catch(() => {
+        setError("Не удалось увеличить количество лайков.");
+      });
+    }
+  };
+
+  if (!post) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", marginTop: 5 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <div className="post-page">
@@ -78,14 +91,14 @@ const PostDetails: React.FC = () => {
             <div key={comment.id} className="comment">
               <Typography variant="h6" className="author">{comment.author}</Typography>
               <Typography variant="body2" className="text">{comment.text}</Typography>
-         
-              <IconButton
-                color="error"
-                onClick={() => handleDeleteComment(comment.id)}
-                sx={{ marginLeft: "10px" }}
-              >
-                <DeleteIcon />
-              </IconButton>
+              <div className="comment-footer">
+                <IconButton
+                  className="delete-btn"
+                  onClick={() => handleDeleteComment(comment.id)}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </div>
             </div>
           ))
         )}
@@ -107,8 +120,12 @@ const PostDetails: React.FC = () => {
       </div>
 
       <Link to="/">
-        <button className="back-button">Назад</button>
+        <Button variant="outlined" sx={{ marginTop: 2 }}>
+          Назад
+        </Button>
       </Link>
+
+      {error && <div className="error-message">{error}</div>}
     </div>
   );
 };

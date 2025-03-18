@@ -1,7 +1,6 @@
-
-
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { CssBaseline } from "@mui/material"; 
 import PostList from "./pages/PostList";
 import PostDetails from "./pages/PostDeatils";
 import CreatePost from "./pages/CreatePost";
@@ -11,6 +10,7 @@ import Header from "./pages/Header";
 const App: React.FC = () => {
   return (
     <Router>
+      <CssBaseline /> 
       <Header />
       <Routes>
         <Route path="/" element={<PostList />} />

@@ -1,49 +1,46 @@
-
-import React, { useEffect, useState } from "react";
-import { postService } from "../services/axiosApi"; 
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { apiService } from "../services/axiosApi";
+import { IPost } from "../types";
 import { Button, Card, CardContent, Typography, Box, CircularProgress, IconButton } from "@mui/material";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
-import "./Css-styles/PostList.css"; 
-
+import "./Css-styles/PostList.css";
 
 const PostList: React.FC = () => {
-  const [posts, setPosts] = useState<any[]>([]);
+  const [posts, setPosts] = useState<IPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    postService
-      .getPosts()
-      .then((response) => {
-        const postsArray = Object.entries(response.data).map(([id, post]) => ({
-          id,
+    apiService.getPosts().then((data) => {
+      if (data) {
+        const postsArray = Object.entries(data).map(([id, post]) => ({
           ...post,
-
+          id,
           likes: post.likes || 0,
-
         }));
         setPosts(postsArray);
         setLoading(false);
-      })
-      .catch(() => {
+      } else {
         setError("Не удалось загрузить посты.");
         setLoading(false);
-      });
+      }
+    }).catch(() => {
+      setError("Не удалось загрузить посты.");
+      setLoading(false);
+    });
   }, []);
 
   const handleLike = (postId: string) => {
-    postService.incrementLikes(postId).then(() => {
-      setPosts(
-        posts.map((post) =>
-          post.id === postId ? { ...post, likes: (post.likes || 0) + 1 } : post
-        )
-      );
+    apiService.incrementLikes(postId).then(() => {
+      setPosts(posts.map((post) =>
+        post.id === postId ? { ...post, likes: (post.likes || 0) + 1 } : post
+      ));
     });
   };
 
   const handleDeletePost = (postId: string) => {
-    postService.deletePost(postId).then(() => {
+    apiService.deletePost(postId).then(() => {
       setPosts(posts.filter((post) => post.id !== postId));
     }).catch(() => {
       setError("Не удалось удалить пост.");
@@ -83,16 +80,9 @@ const PostList: React.FC = () => {
                     Перейти к посту
                   </Button>
                 </Link>
-
-                <Button
-                  variant="outlined"
-                  color="error"
-                  onClick={() => handleDeletePost(post.id)}
-                  className="delete-button"
-                >
+                <Button variant="outlined" color="error" onClick={() => handleDeletePost(post.id)}>
                   Удалить
                 </Button>
-
                 <div className="likes">
                   <IconButton color="primary" onClick={() => handleLike(post.id)}>
                     <ThumbUpIcon />
@@ -109,4 +99,3 @@ const PostList: React.FC = () => {
 };
 
 export default PostList;
-
